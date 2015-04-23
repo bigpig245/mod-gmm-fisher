@@ -507,8 +507,111 @@ gaussian_mixture<T>::precompute_aux_var()
 /// \date   Feb. 2012
 
 template<class T>
-T
+int
 gaussian_mixture<T>::accumulate_statistics( T* x, bool _s0, bool _s1, bool _s2,
+					    T* s0_ext, T** s1_ext, T** s2_ext )
+{
+  T* s0_active;
+  T** s1_active;
+  T** s2_active;
+
+  int ki = 0;
+
+  if (s0_ext)
+  {
+    s0_active = s0_ext;
+  } else {
+    s0_active = s0;
+  }
+  if (s1_ext)
+  {
+    s1_active = s1_ext;
+  } else {
+    s1_active = s1;
+  }
+  if (s2_ext)
+  {
+    s2_active = s2_ext;
+  } else {
+    s2_active = s2;
+  }
+  
+  T *pst=new T[ngauss];
+  //T llh = posterior( x, pst );
+  T llh = posterior_hard( x, pst );
+
+  // s0_active
+  if( _s0 )
+  {
+    simd::add( ngauss, s0_active, pst ); 
+  }
+  if( _s1 )
+  {
+    // s1 and s2
+    if( _s2 )
+    {
+#pragma omp parallel for
+      for( int k=0; k<ngauss; ++k )
+      {
+        if (pst[k] == 1)
+        {
+          ki = k;
+        }
+        if( pst[k]<param.min_gamma )
+          continue;
+
+        simd::accumulate_stat( ndim, s1_active[k], s2_active[k], x, pst[k] );
+      }
+    }
+    // s1 only
+    else
+    {
+#pragma omp parallel for
+      for( int k=0; k<ngauss; ++k )
+      {
+        if (pst[k] == 1)
+        {
+          ki = k;
+        }
+        if( pst[k]<param.min_gamma )
+          continue;
+        
+        simd::add( ndim, s1_active[k], x, pst[k] );
+      }
+    }
+  }
+  // s2 only
+  else if( _s2 )
+  {
+#pragma omp parallel for
+    for( int k=0; k<ngauss; ++k )
+    {
+      if (pst[k] == 1)
+      {
+        ki = k;
+      }
+      if( pst[k]<param.min_gamma )
+        continue;
+        
+      simd::add2( ndim, s2_active[k], x, pst[k] );
+    }    
+  }
+  delete[] pst; pst=0;
+  return ki;
+}
+
+/// \brief Accumulate statistics
+/// 
+/// \param x sample
+///
+/// \return none
+///
+/// \author Jorge Sanchez
+/// \date   Feb. 2012
+
+template<class T>
+T
+gaussian_mixture<T>::accumulate_statistics_old( T* x, bool _s0, bool _s1, bool _s2,
 					    T* s0_ext, T** s1_ext, T** s2_ext )
 {
   T* s0_active;

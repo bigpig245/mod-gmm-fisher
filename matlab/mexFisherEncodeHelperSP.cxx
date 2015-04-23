@@ -256,7 +256,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
             x[j] = &x_arr[j*x_m];
         }
         
-        fisher_encoder->accumulate(x);
+        int k = fisher_encoder->accumulate(x);
+
+		plhs[0] = mxCreateDoubleScalar(k);
         
     } else if (strcmp(command,"getfk") == 0) {
         // subfunction parameter validation

@@ -1,6 +1,6 @@
 %% test if getfk multiple times change the final result --> ok. don't worry
 function test_accumulate
-	codebook_file = '/net/per610a/export/das11f/plsang/trecvidmed13/feature/codebook/mfcc.bg.rastamat/data/codebook.gmm.256.39.mat';
+	codebook_file = '/home/ntrang/project/output/hmdb51/feature/bow.codebook.devel/imprvdensetraj.hoghof/data/codebook.gmm.256.128.mat';
 	load(codebook_file);
 	
 	fisher_params.grad_weights = false;		% "soft" BOW
@@ -9,7 +9,7 @@ function test_accumulate
     fisher_params.alpha = single(1.0);		% power normalization (set to 1 to disable)
     fisher_params.pnorm = single(0.0);		% norm regularisation (set to 0 to disable)
 	
-    feats = single(rand(39, 2000));
+    feats = single(rand(128, 2000));
     
     cpp_handle = mexFisherEncodeHelperSP('init', codebook, fisher_params);
 	 
@@ -19,7 +19,7 @@ function test_accumulate
     
     cpp_handle = mexFisherEncodeHelperSP('init', codebook, fisher_params);
 	 
-	mexFisherEncodeHelperSP('accumulate', cpp_handle, feats(:,1:500));
+	k = mexFisherEncodeHelperSP('accumulate', cpp_handle, feats(:,1:500));
 	code3 = mexFisherEncodeHelperSP('getfk', cpp_handle);
 	mexFisherEncodeHelperSP('accumulate', cpp_handle, feats(:,501:1000)); 
 	code4 = mexFisherEncodeHelperSP('getfk', cpp_handle);
@@ -41,7 +41,7 @@ function test_accumulate
 end
 
 function test_accumulate_2
-	codebook_file = '/net/per900a/raid0/plsang/trecvidmed10/feature/bow.codebook.trecvidmed10.devel/densetrajectory.mbh/data/codebook.gmm.256.mat';
+	codebook_file = '/home/ntrang/project/output/hmdb51/feature/bow.codebook.devel/imprvdensetraj.hoghof/data/codebook.gmm.256.128.mat';
 	load(codebook_file);
 	
 	fisher_params.grad_weights = false;		% "soft" BOW

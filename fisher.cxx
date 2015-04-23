@@ -128,16 +128,18 @@ fisher<T>::accumulate( std::vector<T*> &x )
     assert(gmm);
 	 
 	int nsamples = (int)x.size();
+
+	int ki = 0;
 	
     wghsum += 1.0*nsamples;
 
 	for( int i=0; i<nsamples; ++i )
     {
-      gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
+      ki = gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
 				  s0, s1, s2 );
     }
     
-	return 0;
+	return ki;
 }
 
 template<class T>
@@ -368,6 +370,8 @@ int
 fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk )
 {  
 
+  int ki = 0;
+
   assert(gmm);
 
   assert( x.size()==wghx.size() );
@@ -410,7 +414,7 @@ fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk )
     }
     for( int i=0; i<nsamples; ++i )
     {
-      gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
+      ki = gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
 				  s0, s1, s2 );
     }
   }
@@ -471,7 +475,7 @@ fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk )
   
   alpha_and_lp_normalization(fk);
   
-  return 0;
+  return ki;
 }
 
 
@@ -481,6 +485,8 @@ fisher<T>::test( std::vector<T*> &x, T *stats )
 {  
 
   assert(gmm);
+
+  int ki = 0;
 
   int nsamples = x.size();
 
@@ -515,7 +521,7 @@ fisher<T>::test( std::vector<T*> &x, T *stats )
     }
     for( int i=0; i<nsamples; ++i )
     {
-      gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
+      ki = gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
 				  s0, s1, s2 );
     }
   }
@@ -549,7 +555,7 @@ fisher<T>::test( std::vector<T*> &x, T *stats )
         }      
     }
     
-  return 0;
+  return ki;
 }
 
 template<class T>
@@ -604,6 +610,8 @@ int
 fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk, T *stats)
 {  
 
+  int ki = 0;
+
   assert(gmm);
 
   assert( x.size()==wghx.size() );
@@ -646,7 +654,7 @@ fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk, T *stats)
     }
     for( int i=0; i<nsamples; ++i )
     {
-      gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
+      ki = gmm->accumulate_statistics( x[i], true, param.grad_means||param.grad_variances, param.grad_variances,
 				  s0, s1, s2 );
     }
   }
@@ -709,7 +717,7 @@ fisher<T>::compute( std::vector<T*> &x, std::vector<T> &wghx, T *fk, T *stats)
   
   concat_stats(wghsum, s0, s1, s2, stats);
 
-  return 0;
+  return ki;
 }
 
 template<class T>

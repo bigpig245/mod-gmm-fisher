@@ -88,7 +88,10 @@ protected:
   T **mean, **var, *coef;
 
   void reset_stat_acc();
-  T accumulate_statistics( T* sample, bool _s0=true, bool _s1=true, bool _s2=true,
+  int accumulate_statistics( T* sample, bool _s0=true, bool _s1=true, bool _s2=true,
+			   T* s0_ext=0, T** s1_ext=0, T** s2_ext=0 );
+
+  T accumulate_statistics_old( T* sample, bool _s0=true, bool _s1=true, bool _s2=true,
 			   T* s0_ext=0, T** s1_ext=0, T** s2_ext=0 );
   T *s0, **s1, **s2;
 
